@@ -1,11 +1,10 @@
 package com.pevg.www.envios.entities;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -17,4 +16,6 @@ public class Customer {
     private String last_name;
     private String address;
     private String city;
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Shipping> shipping_list;
 }
