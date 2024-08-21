@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mareos
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: mareos
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  db_init:
+    image: postgres:15-alpine
+    depends_on:
+      - app
+    networks:
+      - app-network
+    volumes:
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      sh -c " echo 'Esperando a que la aplicación se inicie...'; sleep 20; export PGPASSWORD='admin'; psql -h db -U admin -d mareos -f /docker-entrypoint-initdb.d/init.sql; echo 'Inserciones completadas.'"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+
+networks:
+  app-network:
+
+
+volumes:
+  postgres_data:
