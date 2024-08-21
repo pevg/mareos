@@ -7,10 +7,6 @@ Este proyecto es un sistema de gestión de envíos desarrollado en Java utilizan
 - [Tecnologías Utilizadas](#tecnologías-utilizadas)
 - [Arquitectura del Proyecto](#arquitectura-del-proyecto)
 - [Configuración del Entorno](#configuración-del-entorno)
-- [Endpoints Principales](#endpoints-principales)
-- [Ejecución del Proyecto](#ejecución-del-proyecto)
-- [Pruebas](#pruebas)
-- [Consideraciones Adicionales](#consideraciones-adicionales)
 - [Instalación](#instalación)
 
 ## Tecnologías Utilizadas
