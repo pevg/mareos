@@ -1,21 +1,26 @@
 package com.pevg.www.envios.services;
 
 import com.pevg.www.envios.dtos.ProductSummary;
+import com.pevg.www.envios.dtos.ShippingStatus;
 import com.pevg.www.envios.dtos.TransitionRequest;
 import com.pevg.www.envios.entities.Shipping;
-import com.pevg.www.envios.entities.ShippingItem;
 import com.pevg.www.envios.enums.ShippingState;
 import com.pevg.www.envios.exceptions.InvalidTransitionException;
 import com.pevg.www.envios.repositories.ShippingItemRepository;
 import com.pevg.www.envios.repositories.ShippingRepository;
+
+import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class ShippingService {
 
     @Autowired
@@ -31,14 +36,18 @@ public class ShippingService {
         stateTransitions.put(ShippingState.EN_CAMINO, new ShippingState[]{ShippingState.ENTREGADO, ShippingState.CANCELADO});
     }
 
-    public ShippingService(ShippingRepository shippingRepository, ShippingItemRepository shippingItemRepository) {
-        this.shippingRepository = shippingRepository;
-        this.shippingItemRepository = shippingItemRepository;
-    }
-
     public ResponseEntity<List<Shipping>> getAll() {
         List<Shipping> shippins = shippingRepository.findAll();
         return new ResponseEntity<>(shippins, HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<ShippingStatus>> getStatus() {
+        List<Shipping> shippins = shippingRepository.findAll();
+
+        List<ShippingStatus> status = shippins.stream()
+        .map(shipping -> new ShippingStatus(shipping.getId(), shipping.getState()))
+        .collect(Collectors.toList());
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     public ResponseEntity<Shipping> getById(int id) {
@@ -57,7 +66,7 @@ public class ShippingService {
             throw new InvalidTransitionException("Estado de transición incorrecto: " + request.getTransition());
         }
         validateTransition(currentState, newState);
-        shipping.setState(String.valueOf(newState));
+        shipping.setState(String.valueOf(newState).toLowerCase());
         return shippingRepository.save(shipping);
     }
 
